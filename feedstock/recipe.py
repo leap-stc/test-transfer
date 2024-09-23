@@ -38,7 +38,10 @@ class Transfer(beam.PTransform):
         
         # ToDo: Add profile/config from env vars for OSN?
         # ToDo: Fix input store path from gcs to s3.
-        
+        from google.cloud import secretmanager
+        client = secretmanager.SecretManagerServiceClient()
+        client.get_secret(request={"name": "DUMMY"})
+        logger.debug(client.get_secret(request={"name": "DUMMY"}))
 
         # command = f"s5cmd --profile <ADD PROFILE> --endpoint-url https://nyu1.osn.mghpcc.org cp {source_store} {self.target_store}'"
         # subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -50,12 +53,6 @@ class Transfer(beam.PTransform):
         return pcoll | beam.Map(self.transfer)
 
 
-# class S5cmdTransfer(beam.DoFn):
-#     def transfer(self, src_path, dst_path):
-#         # TODO: Add keys
-        
-
-#         return dst_path
 
 with beam.Pipeline() as p:
     (
