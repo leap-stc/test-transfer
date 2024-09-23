@@ -2,3 +2,5 @@ pangeo-forge-recipes==0.10.7
 apache-beam[gcp]
 gcsfs
 leap-data-management-utils==0.0.12
+google-cloud-secret-manager
+s5cmd

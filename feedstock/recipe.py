@@ -4,38 +4,70 @@ Test transfer
 
 import os
 import apache_beam as beam
-from leap_data_management_utils.data_management_transforms import (
-    get_catalog_store_urls,
-)
+# from leap_data_management_utils.data_management_transforms import (
+#     get_catalog_store_urls,
+# )
 from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 
 # parse the catalog store locations (this is where the data is copied to after successful write (and maybe testing)
-catalog_store_urls = get_catalog_store_urls("feedstock/catalog.yaml")
+# catalog_store_urls = get_catalog_store_urls("feedstock/catalog.yaml")
 
 
 
-src_path = ['gs://leap/<DATASET.zarr>']
-dst_path =  's3://m2lines-test/<OSN-LEAP-BUCKET-NAME/ds-name.zarr'
+src_path = 'gs://leap-scratch/norlandrhagen/air_temp.zarr'
+dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr'
 
 import subprocess
-src_pattern = pattern_from_file_sequence(src_path[0], concat_dim="time")
+src_pattern = pattern_from_file_sequence([src_path], concat_dim="time")
 
 
+import xarray as xr 
+from dataclasses import dataclass
 
-class S5cmdTransfer(beam.DoFn):
-    def transfer(self, src_path, dst_path):
+import logging 
 
-        # TODO: Add keys
+logger = logging.getLogger(__name__)
+@dataclass
+class Transfer(beam.PTransform):
+    target_store: str
 
-        command = f"s5cmd --profile <ADD PROFILE> --endpoint-url https://nyu1.osn.mghpcc.org cp {src_path} {dst_path}'"
-        subprocess.run(command, shell=True, capture_output=True, text=True)
+    def transfer(self, source_store) -> str:
+        
+        logger.debug(f'transfer from {source_store} to {self.target_store}')
+        print(self.target_store)
+        
+        # ToDo: Add profile/config from env vars for OSN?
+        # ToDo: Fix input store path from gcs to s3.
+        
 
-        return dst_path
+        # command = f"s5cmd --profile <ADD PROFILE> --endpoint-url https://nyu1.osn.mghpcc.org cp {source_store} {self.target_store}'"
+        # subprocess.run(command, shell=True, capture_output=True, text=True)
 
-transfer = (
-    beam.Create(src_pattern.items())
-    | beam.ParDo()
-    | beam.ParDo(S5cmdTransfer(), src_path, dst_path)
+        return self.target_store
+    
 
-)
+    def expand(self, pcoll: beam.PCollection) -> beam.PCollection:
+        return pcoll | beam.Map(self.transfer)
+
+
+# class S5cmdTransfer(beam.DoFn):
+#     def transfer(self, src_path, dst_path):
+#         # TODO: Add keys
+        
+
+#         return dst_path
+
+with beam.Pipeline() as p:
+    (
+    p
+    | beam.Create([src_path])
+    | Transfer(target_store = dst_path)
+    | beam.Map(print)
+
+    )      
+# transfer = (
+#     beam.Create(src_pattern.items())
+#     | beam.ParDo(S5cmdTransfer(), src_path, dst_path)
+
+# )
 
