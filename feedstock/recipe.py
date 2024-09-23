@@ -13,7 +13,6 @@ from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 # catalog_store_urls = get_catalog_store_urls("feedstock/catalog.yaml")
 
 
-
 src_path = 'gs://leap-scratch/norlandrhagen/air_temp.zarr'
 dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr'
 
@@ -37,16 +36,13 @@ class Transfer(beam.PTransform):
         logger.debug(f'transfer from {source_store} to {self.target_store}')
         print(self.target_store)
         
-        # ToDo: Add profile/config from env vars for OSN?
         # ToDo: Fix input store path from gcs to s3.
         from google.cloud import secretmanager
         client = secretmanager.SecretManagerServiceClient()
-        aws_id = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY/versions/latest").payload['data']
-        aws_secret = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest").payload['data']
+        aws_id = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY/versions/latest").payload.data.decode("UTF-8")
+        aws_secret = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest").payload.data.decode("UTF-8")
         os.environ["aws_access_key_id"] = aws_id
         os.environ["aws_secret_access_key"] = aws_secret
-
-        # the .payload attribute contains the secret.
 
         command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org ls s3://m2lines-test/" # {source_store} {self.target_store}'"
         ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
