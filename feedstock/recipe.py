@@ -14,7 +14,7 @@ from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 
 
 src_path = 'gs://leap-scratch/norlandrhagen/air_temp.zarr'
-dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr/*'
+dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr/'
 
 import subprocess
 src_pattern = pattern_from_file_sequence([src_path], concat_dim="time")
@@ -40,10 +40,9 @@ class Transfer(beam.PTransform):
         client = secretmanager.SecretManagerServiceClient()
         aws_id = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY/versions/latest").payload.data.decode("UTF-8")
         aws_secret = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest").payload.data.decode("UTF-8")
-        os.environ["aws_access_key_id"] = aws_id
-        os.environ["aws_secret_access_key"] = aws_secret
-
-        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org {source_store} '{self.target_store}'"
+        os.environ["AWS_ACCESS_KEY_ID"] = aws_id
+        os.environ["AWS_SECRET_ACCESS_KEY"] = aws_secret
+        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org cp {source_store} {self.target_store}"
         logger.warn(command)
 
         ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
