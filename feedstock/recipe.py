@@ -13,7 +13,7 @@ from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 # catalog_store_urls = get_catalog_store_urls("feedstock/catalog.yaml")
 
 
-src_path = 's3://leap-scratch/norlandrhagen/air_temp.zarr'
+src_path = 'gs://leap-scratch/norlandrhagen/air_temp.zarr'
 dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr/'
 
 import subprocess
