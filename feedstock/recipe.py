@@ -32,7 +32,8 @@ class Transfer(beam.PTransform):
     target_store: str
 
     def transfer(self, source_store) -> str:
-        
+        import os
+
         logger.debug(f'transfer from {source_store} to {self.target_store}')
         print(self.target_store)
         
@@ -40,12 +41,17 @@ class Transfer(beam.PTransform):
         # ToDo: Fix input store path from gcs to s3.
         from google.cloud import secretmanager
         client = secretmanager.SecretManagerServiceClient()
-        client.get_secret(request={"name": "DUMMY"})
-        logger.debug(client.get_secret(request={"name": "DUMMY"}))
+        aws_id = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY/versions/latest").payload['data']
+        aws_secret = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest").payload['data']
+        os.environ["aws_access_key_id"] = aws_id
+        os.environ["aws_secret_access_key"] = aws_secret
 
-        # command = f"s5cmd --profile <ADD PROFILE> --endpoint-url https://nyu1.osn.mghpcc.org cp {source_store} {self.target_store}'"
-        # subprocess.run(command, shell=True, capture_output=True, text=True)
+        # the .payload attribute contains the secret.
 
+        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org ls s3://m2lines-test/" # {source_store} {self.target_store}'"
+        ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
+        logger.debug(ls_out)
+        del client
         return self.target_store
     
 
