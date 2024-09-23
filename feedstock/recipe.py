@@ -32,10 +32,9 @@ class Transfer(beam.PTransform):
 
     def transfer(self, source_store) -> str:
         import os
-        target_store = target_store(1)
         logger.debug(f'transfer from {source_store} to {self.target_store}')
-        print(self.target_store)
-        
+        target_store = self.target_store(1)
+
         # ToDo: Fix input store path from gcs to s3.
         from google.cloud import secretmanager
         client = secretmanager.SecretManagerServiceClient()
@@ -44,13 +43,13 @@ class Transfer(beam.PTransform):
         os.environ["aws_access_key_id"] = aws_id
         os.environ["aws_secret_access_key"] = aws_secret
 
-        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org {source_store} {self.target_store}"
+        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org {source_store} {target_store}"
         logger.warn(command)
 
         ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
         logger.warn(ls_out)
         del client
-        return self.target_store
+        return target_store
     
 
     def expand(self, pcoll: beam.PCollection) -> beam.PCollection:
