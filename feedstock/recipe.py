@@ -44,7 +44,8 @@ class Transfer(beam.PTransform):
         os.environ["aws_access_key_id"] = aws_id
         os.environ["aws_secret_access_key"] = aws_secret
 
-        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org" {source_store} {self.target_store}"
+        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org {source_store} {self.target_store}"
+
         ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
         logger.debug(ls_out)
         del client
