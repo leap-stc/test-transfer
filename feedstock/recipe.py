@@ -14,7 +14,7 @@ from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 
 
 src_path = 'gs://leap-scratch/norlandrhagen/air_temp.zarr'
-dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr'
+dst_path =  's3://m2lines-test/test-transfer/air_temp.zarr/*'
 
 import subprocess
 src_pattern = pattern_from_file_sequence([src_path], concat_dim="time")
@@ -32,8 +32,8 @@ class Transfer(beam.PTransform):
 
     def transfer(self, source_store) -> str:
         import os
-        logger.debug(f'transfer from {source_store(1)} to {self.target_store}')
-        source_store = source_store(1)
+        logger.debug(f'transfer from {source_store[1]} to {self.target_store}')
+        source_store = source_store[1]
 
         # ToDo: Fix input store path from gcs to s3.
         from google.cloud import secretmanager
@@ -43,7 +43,7 @@ class Transfer(beam.PTransform):
         os.environ["aws_access_key_id"] = aws_id
         os.environ["aws_secret_access_key"] = aws_secret
 
-        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org {source_store} {self.target_store}"
+        command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org {source_store} '{self.target_store}'"
         logger.warn(command)
 
         ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
