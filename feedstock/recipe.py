@@ -54,17 +54,16 @@ class Transfer(beam.PTransform):
 
 
 
-with beam.Pipeline() as p:
-    (
-    p
-    | beam.Create([src_path])
+# with beam.Pipeline() as p:
+#     (
+#     p
+#     | beam.Create([src_path])
+#     | Transfer(target_store = dst_path)
+#     | beam.Map(print)
+
+#     )      
+transfer = (
+    beam.Create([src_path])
     | Transfer(target_store = dst_path)
-    | beam.Map(print)
-
-    )      
-# transfer = (
-#     beam.Create(src_pattern.items())
-#     | beam.ParDo(S5cmdTransfer(), src_path, dst_path)
-
-# )
+)
 
