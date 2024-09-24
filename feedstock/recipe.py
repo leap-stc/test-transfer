@@ -9,7 +9,6 @@ import apache_beam as beam
 # )
 from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 import subprocess
-import os
 
 from dataclasses import dataclass
 
@@ -38,25 +37,32 @@ class Transfer(beam.PTransform):
         from google.cloud import secretmanager
 
         client = secretmanager.SecretManagerServiceClient()
-        aws_id = client.access_secret_version(
+        osn_id = client.access_secret_version(
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY/versions/latest"
         ).payload.data.decode("UTF-8")
-        aws_secret = client.access_secret_version(
+        osn_secret = client.access_secret_version(
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest"
         ).payload.data.decode("UTF-8")
 
         # ToDo: How do we get service_account_credentials ie gcs_credentials
-        os.environ["RCLONE_CONFIG"] = f"""
-            [leaposn]
-            type = s3
-            provider = Ceph
-            access_key_id = {aws_id}
-            secret_access_key = {aws_secret}
-            endpoint = https://nyu1.osn.mghpcc.org
-            """
 
+        bucket_name = "m2lines-test/"
+        rclone_create_osn = f"""
+        rclone config create "osn" "s3" \
+        provider "Ceph" \
+        access_key_id "{osn_id}" \
+        secret_access_key "{osn_secret}" \
+        endpoint "https://nyu1.osn.mghpcc.org" \
+        """
+        create_osn_prof = subprocess.run(
+            rclone_create_osn,
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warn(create_osn_prof)
         ls_out = subprocess.run(
-            "rclone ls leaposn:/m2lines-test",
+            f"rclone ls osn:{bucket_name}",
             shell=True,
             capture_output=True,
             text=True,
