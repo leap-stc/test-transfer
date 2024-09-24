@@ -54,6 +54,11 @@ class Transfer(beam.PTransform):
         secret_access_key "{osn_secret}" \
         endpoint "https://nyu1.osn.mghpcc.org" \
         """
+        rclone_create_gcs = f"""
+        rclone config create "gcs-leap" "google-cloud-storage" \
+        provider "Google Cloud Storage" \
+        bucket_name="leap-scratch" 
+        """
         create_osn_prof = subprocess.run(
             rclone_create_osn,
             shell=True,
@@ -61,8 +66,19 @@ class Transfer(beam.PTransform):
             text=True,
         )
         logger.warn(create_osn_prof)
+
+        create_gcs_prof = subprocess.run(
+            rclone_create_gcs,
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warn(create_gcs_prof)
+
+
+        
         ls_out = subprocess.run(
-            f"rclone ls osn:{bucket_name}",
+            f"rclone cp gcs-leap:m2lines-test/test-transfer/air_temp.zarr/ osn:{bucket_name}/air_temp.zarr/",
             shell=True,
             capture_output=True,
             text=True,
