@@ -71,4 +71,6 @@ class Transfer(beam.PTransform):
 # recipe = (
 #     beam.Create(pattern.items())
 
-transfer = beam.Create(src_pattern.items()) | Transfer(target_store=dst_path)
+transfer = beam.Create(src_pattern.items()) | beam.Map(
+    print
+)  # | Transfer(target_store=dst_path)
