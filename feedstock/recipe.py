@@ -39,19 +39,21 @@ class Transfer(beam.PTransform):
         )
         logger.warn(ls_out)
 
-        # ToDo: Fix input store path from gcs to s3.
         # from google.cloud import secretmanager
         # client = secretmanager.SecretManagerServiceClient()
         # aws_id = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY/versions/latest").payload.data.decode("UTF-8")
         # aws_secret = client.access_secret_version(name=f"projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest").payload.data.decode("UTF-8")
-        # os.environ["AWS_ACCESS_KEY_ID"] = aws_id
-        # os.environ["AWS_SECRET_ACCESS_KEY"] = aws_secret
-        # command = f"s5cmd --endpoint-url https://nyu1.osn.mghpcc.org cp {source_store} {self.target_store}"
-        # logger.warn(command)
 
-        # ls_out = subprocess.run(command, shell=True, capture_output=True, text=True)
-        # logger.warn(ls_out)
-        # del client
+        # ToDo: How do we get service_account_credentials ie gcs_credentials
+        # os.environ['RCLONE_CONFIG'] = f"""
+        #     [ceph]
+        #     type = s3
+        #     env_auth = false
+        #     access_key_id = {aws_id}
+        #     secret_access_key = {aws_secret}
+        #     endpoint = https://nyu1.osn.mghpcc.org
+        #     """
+
         return self.target_store
 
     def expand(self, pcoll: beam.PCollection) -> beam.PCollection:
