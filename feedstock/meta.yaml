@@ -4,4 +4,3 @@ description: >
 recipes:
   - id: "transfer"
     object: "recipe:transfer"
-

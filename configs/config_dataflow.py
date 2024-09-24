@@ -6,6 +6,7 @@ FEEDSTOCK_NAME = repo_path.split('/')[-1]
 
 c.Bake.prune = False
 c.Bake.bakery_class = "pangeo_forge_runner.bakery.dataflow.DataflowBakery"
+c.Bake.container_image = "rclone/rclone:latest'"
 c.DataflowBakery.use_dataflow_prime = False
 c.DataflowBakery.max_workers = 1
 c.DataflowBakery.use_public_ips = True
