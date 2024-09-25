@@ -44,37 +44,28 @@ class Transfer(beam.PTransform):
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest"
         ).payload.data.decode("UTF-8")
 
-        # ToDo: How do we get service_account_credentials ie gcs_credentials
 
-        bucket_name = "m2lines-test/"
-        rclone_create_osn = f"""
-        rclone config create "osn" "s3" \
-        provider "Ceph" \
-        access_key_id "{osn_id}" \
-        secret_access_key "{osn_secret}" \
-        endpoint "https://nyu1.osn.mghpcc.org" \
-        """
-        rclone_create_gcs = f"""
-        rclone config create "gcs" "google cloud storage" \
-        bucket_name "leap-scratch" \
-        --gcs-env-auth "true" \
-        """
-        
-        create_osn_prof = subprocess.run(
-            rclone_create_osn,
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warn(create_osn_prof)
 
-        create_gcs_prof = subprocess.run(
-            rclone_create_gcs,
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warn(create_gcs_prof)
+
+        rclone_create_config_file_str = f"""
+        [leap-gcs-scratch]
+        type = google cloud storage
+        env_auth = true
+
+        [osn-test]
+        type = s3
+        provider = Ceph
+        endpoint = https://nyu1.osn.mghpcc.org
+        access_key_id = {osn_id}
+        secret_access_key = {osn_secret}
+        no_touch_bucket = true 
+
+        """
+
+        with open('~/.config/rclone/rclone.conf', 'w+') as of:
+            of.write(rclone_create_config_file_str)
+
+
 
         ls_out_osn = subprocess.run(
             f"rclone ls osn:m2lines-test",
