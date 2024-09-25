@@ -78,7 +78,7 @@ class Transfer(beam.PTransform):
 
         
         copy_out = subprocess.run(
-            f"rclone sync gcs-leap:leap-scratch/norlandrhagen/air_temp.nc osn:{bucket_name}air_temp_rclone.zarr/",
+            f"rclone -v copy gcs-leap:leap-scratch/norlandrhagen/air_temp.nc osn:{bucket_name}air_temp_rclone.zarr/",
             shell=True,
             capture_output=True,
             text=True,
