@@ -55,7 +55,7 @@ class Transfer(beam.PTransform):
         endpoint "https://nyu1.osn.mghpcc.org" \
         """
         rclone_create_gcs = f"""
-        rclone config create "gcs-leap" "google cloud storage" \
+        rclone config create "gcs" "google cloud storage" \
         bucket_name "leap-scratch" \
         gcs-env-auth "true"
         """
@@ -75,15 +75,29 @@ class Transfer(beam.PTransform):
         )
         logger.warn(create_gcs_prof)
 
-
-        
-        copy_out = subprocess.run(
-            f"rclone -v copy gcs-leap:leap-scratch/norlandrhagen/air_temp.nc osn:{bucket_name}air_temp_rclone.zarr/",
+        ls_out_osn = subprocess.run(
+            f"rclone ls osn::m2lines-test",
             shell=True,
             capture_output=True,
             text=True,
         )
-        logger.warn(copy_out)
+        logger.warn(ls_out_osn)
+    
+        ls_out_gcp = subprocess.run(
+            f"rclone ls gcs::leap-scratch/norlandrhagen/",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warn(ls_out_gcp)
+        
+        # copy_out = subprocess.run(
+        #     f"rclone -v copy gcs:leap-scratch/norlandrhagen/air_temp.nc osn:{bucket_name}air_temp_rclone.zarr/",
+        #     shell=True,
+        #     capture_output=True,
+        #     text=True,
+        # )
+        # logger.warn(copy_out)
         del client
         return self.target_store
 
