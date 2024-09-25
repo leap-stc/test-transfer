@@ -57,8 +57,9 @@ class Transfer(beam.PTransform):
         rclone_create_gcs = f"""
         rclone config create "gcs" "google cloud storage" \
         bucket_name "leap-scratch" \
-        gcs-env-auth "true"
+        --gcs-env-auth "true" \
         """
+        
         create_osn_prof = subprocess.run(
             rclone_create_osn,
             shell=True,
@@ -76,7 +77,7 @@ class Transfer(beam.PTransform):
         logger.warn(create_gcs_prof)
 
         ls_out_osn = subprocess.run(
-            f"rclone ls osn::m2lines-test",
+            f"rclone ls osn:m2lines-test",
             shell=True,
             capture_output=True,
             text=True,
@@ -84,7 +85,7 @@ class Transfer(beam.PTransform):
         logger.warn(ls_out_osn)
     
         ls_out_gcp = subprocess.run(
-            f"rclone ls gcs::leap-scratch/norlandrhagen/",
+            f"rclone ls gcs:leap-scratch/norlandrhagen/",
             shell=True,
             capture_output=True,
             text=True,
