@@ -59,15 +59,17 @@ class Transfer(beam.PTransform):
         source = os.path.join(source_bucket, source_prefix, store_name).rstrip('/')
         target = os.path.join(target_bucket, target_prefix, store_name).rstrip('/')
   
-
         copy_proc = subprocess.run(
             f'rclone copy -vv -P "{source}/" "{target}/"',
             shell=True, #consider false
             capture_output=True, #set to false once we have this working!
             text=True,
         )
+        logger.warning(f"COPY STDOUT:{copy_proc.stdout}")
+        logger.warning(f"COPY STDERR:{copy_proc.stderr}")
+        logger.warning(copy_proc.stderr)
         copy_proc.check_returncode()
-        logger.warning(copy_proc)
+        del copy_proc
 
         del client
         return self.target_store
