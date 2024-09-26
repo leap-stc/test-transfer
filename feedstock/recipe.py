@@ -63,7 +63,7 @@ class Transfer(beam.PTransform):
 
         gcs_remote = ":'google cloud storage',env_auth=true:"
         # # this does not work due to the colon in the endpoint? Gahhh this is awful...
-        osn_remote = ":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
+        osn_remote = f":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
         # osn_remote = 'osn:'
         
         list_gcs = subprocess.run(
