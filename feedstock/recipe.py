@@ -18,7 +18,7 @@ import logging
 
 
 src_path = "gs://leap-scratch/norlandrhagen/air_temp.zarr"
-dst_path = "s3://m2lines-test/test-transfer/air_temp.zarr/"
+dst_path = "s3://m2lines-test/test-transfer-beam/air_temp.zarr/"
 
 
 src_pattern = pattern_from_file_sequence([src_path], concat_dim="time")
@@ -43,6 +43,25 @@ class Transfer(beam.PTransform):
         osn_secret = client.access_secret_version(
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest"
         ).payload.data.decode("UTF-8")
+
+        list_configs = subprocess.run(
+            [
+                "rclone",
+                "config",
+                "file",
+            ],
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warning(list_configs)
+        # rclone_create_config_osn_str = f"rclone config create osn s3 \
+        #       provider=Ceph endpoint=https://nyu1.osn.mghpcc.org \
+        #         --access_key_id={osn_id} \
+        #         --secret_access_key={osn_secret}"
+        
+
+
 
         # Todo!
         # 1. use old method for osn create with subprocess
