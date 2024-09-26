@@ -55,7 +55,7 @@ class Transfer(beam.PTransform):
         # source_prefix = "data-library/feedstocks/GODAS"
         source_prefix = ""
         # target_prefix = "test-transfer-beam-clean-2workers"
-        target_prefix = "test-transfer-500GB"
+        target_prefix = "test-transfer-500GB-faster"
 
         # construct full valid rclone 'paths'
         source = os.path.join(source_bucket, source_prefix, store_name).strip('/')
