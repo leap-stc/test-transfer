@@ -66,7 +66,7 @@ class Transfer(beam.PTransform):
         osn_remote = f":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
         
         list_gcs = subprocess.run(
-            f'rclone -vv lsf "{gcs_remote}leap-scratch/"',
+            f'rclone lsf "{gcs_remote}leap-scratch/"',
             shell=True,
             capture_output=True,
             text=True,
@@ -75,7 +75,7 @@ class Transfer(beam.PTransform):
 
 
         list_osn = subprocess.run(
-            f'rclone -vv lsf "{osn_remote}m2lines-test/"',
+            f'rclone lsf "{osn_remote}m2lines-test/"',
             shell=True,
             capture_output=True,
             text=True,
@@ -85,7 +85,7 @@ class Transfer(beam.PTransform):
 
 
         copy_proc = subprocess.run(
-            f'rclone copy -vv -P {gcs_remote}leap-persistent/data-library/feedstocks/GODAS/GODAS_surface_level.zarr/ {osn_remote}test-transfer-beam/GODAS_surface_level.zarr',
+            f'rclone copy -P "{gcs_remote}leap-persistent/data-library/feedstocks/GODAS/GODAS_surface_level.zarr/" "{osn_remote}test-transfer-beam/GODAS_surface_level.zarr"',
             shell=True, #consider false
             capture_output=True, #set to false once we have this working!
             text=True,
