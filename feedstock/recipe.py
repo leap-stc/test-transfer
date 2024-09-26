@@ -64,7 +64,7 @@ class Transfer(beam.PTransform):
         logger.warning(f"Copying from {source} to {target}")
   
         copy_proc = subprocess.run(
-            f'rclone copy -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
+            f'rclone copy --transfers 16 -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
             shell=True,
             capture_output=False, # will expose secrets if true
             text=True, 
