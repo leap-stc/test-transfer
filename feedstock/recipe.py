@@ -61,13 +61,13 @@ class Transfer(beam.PTransform):
 
 
 
-        gcs_remote = ":'google cloud storage',env_auth=true:"
+        gcs_remote = ':"google cloud storage",env_auth=true:'
         # # this does not work due to the colon in the endpoint? Gahhh this is awful...
-        osn_remote = f":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
+        osn_remote = '"'+f':s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:'+'"'
         # osn_remote = 'osn:'
         
         list_gcs = subprocess.run(
-            f'rclone -vv lsf "{gcs_remote}"leap-scratch/',
+            f'rclone -vv lsf {gcs_remote}leap-scratch/',
             shell=True,
             capture_output=True,
             text=True,
@@ -76,7 +76,7 @@ class Transfer(beam.PTransform):
 
 
         list_osn = subprocess.run(
-            f'rclone -vv lsf "{osn_remote}"m2lines-test/',
+            f'rclone -vv lsf "{osn_remote}m2lines-test/"',
             shell=True,
             capture_output=True,
             text=True,
