@@ -45,26 +45,28 @@ class Transfer(beam.PTransform):
         ).payload.data.decode("UTF-8")
 
 
-        rclone_create_config_osn_str = f"rclone config create osn s3 \
-              provider=Ceph endpoint=https://nyu1.osn.mghpcc.org \
-                --access_key_id={osn_id} \
-                --secret_access_key={osn_secret}"
+        # rclone_create_config_osn_str = f"rclone config create osn s3 \
+        #       provider=Ceph endpoint=https://nyu1.osn.mghpcc.org \
+        #         --access_key_id={osn_id} \
+        #         --secret_access_key={osn_secret}"
         
-        osn_config_proc = subprocess.run(
-            rclone_create_config_osn_str,
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warning(osn_config_proc)
-        osn_config_proc.check_returncode()
+        # osn_config_proc = subprocess.run(
+        #     rclone_create_config_osn_str,
+        #     shell=True,
+        #     capture_output=True,
+        #     text=True,
+        # )
+        # logger.warning(osn_config_proc)
+        # osn_config_proc.check_returncode()
 
 
 
-        gcs_remote = ':"google cloud storage",env_auth=true:'
+        gcs_remote = """:"google cloud storage",env_auth=true:"""
         # # this does not work due to the colon in the endpoint? Gahhh this is awful...
-        # osn_remote = f':s3,provider=Ceph,endpoint="https://nyu1.osn.mghpcc.org",access_key_id={osn_id},secret_access_key={osn_secret}:'
-        osn_remote = 'osn:'
+        osn_remote = f"""\
+            ":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"\
+                """
+        # osn_remote = 'osn:'
         
         list_gcs = subprocess.run(
             f'rclone -vv lsf {gcs_remote}leap-scratch/',
