@@ -72,12 +72,9 @@ class Transfer(beam.PTransform):
         no_touch_bucket = true
 
         """
-
-        with open("/root/.config/rclone/rclone.conf", "w+") as of:
-            of.write(rclone_create_config_file_str)
             
-        # with open(".config/rclone/rclone.conf", "w+") as of:
-        #     of.write(rclone_create_config_file_str)
+        with open(".config/rclone/rclone.conf", "w+") as of:
+            of.write(rclone_create_config_file_str)
 
         
         list_configs = subprocess.run(
