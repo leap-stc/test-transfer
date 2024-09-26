@@ -9,6 +9,7 @@ import apache_beam as beam
 # )
 from pangeo_forge_recipes.patterns import pattern_from_file_sequence
 import subprocess
+import os
 
 from dataclasses import dataclass
 
@@ -44,48 +45,23 @@ class Transfer(beam.PTransform):
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest"
         ).payload.data.decode("UTF-8")
 
-
-        # rclone_create_config_osn_str = f"rclone config create osn s3 \
-        #       provider=Ceph endpoint=https://nyu1.osn.mghpcc.org \
-        #         --access_key_id={osn_id} \
-        #         --secret_access_key={osn_secret}"
-        
-        # osn_config_proc = subprocess.run(
-        #     rclone_create_config_osn_str,
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True,
-        # )
-        # logger.warning(osn_config_proc)
-        # osn_config_proc.check_returncode()
-
-
-
         gcs_remote = ":gcs,env_auth=true:"
-        # # this does not work due to the colon in the endpoint? Gahhh this is awful...
         osn_remote = f":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
-        
-        list_gcs = subprocess.run(
-            f'rclone lsf "{gcs_remote}leap-scratch/"',
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warning(list_gcs)
 
+        ## Todo: parse this from input
+        store_name = "GODAS_multi_levels.zarr"
+        source_bucket = f"{gcs_remote}leap-persistent"
+        target_bucket = f"{osn_remote}m2lines-test"
+        source_prefix = "data-library/feedstocks/GODAS"
+        target_prefix = "m2lines-test/test-transfer-beam-clean"
 
-        list_osn = subprocess.run(
-            f'rclone lsf "{osn_remote}m2lines-test/"',
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warning(list_osn)
-        list_osn.check_returncode()
-
+        # construct full valid rclone 'paths'
+        source = os.path.join(source_bucket, source_prefix, store_name).rstrip('/')
+        target = os.path.join(target_bucket, target_prefix, store_name).rstrip('/')
+  
 
         copy_proc = subprocess.run(
-            f'rclone copy -P "{gcs_remote}leap-persistent/data-library/feedstocks/GODAS/GODAS_surface_level.zarr/" "{osn_remote}/m2lines-test/test-transfer-beam/GODAS_surface_level.zarr/"',
+            f'rclone copy -vv -P "{source}/" "{target}/"',
             shell=True, #consider false
             capture_output=True, #set to false once we have this working!
             text=True,
