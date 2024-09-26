@@ -53,24 +53,24 @@ class Transfer(beam.PTransform):
         gcs_remote = ':"google cloud storage",env_auth=true:'
         osn_remote = f':s3,provider=Ceph,endpoint="https://nyu1.osn.mghpcc.org",access_key_id={osn_id},secret_access_key={osn_secret}:'
         
-        list_gcs = subprocess.run(
-            f'rclone -vv lsf {gcs_remote}leap-scratch/',
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warning(list_gcs)
+        # list_gcs = subprocess.run(
+        #     f'rclone -vv lsf {gcs_remote}leap-scratch/',
+        #     shell=True,
+        #     capture_output=True,
+        #     text=True,
+        # )
+        # logger.warning(list_gcs)
 
-        list_osn = subprocess.run(
-            f'rclone -vv lsf {osn_remote}m2lines-test/',
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warning(list_osn)
+        # list_osn = subprocess.run(
+        #     f'rclone -vv lsf {osn_remote}m2lines-test/',
+        #     shell=True,
+        #     capture_output=True,
+        #     text=True,
+        # )
+        # logger.warning(list_osn)
 
         copy_proc = subprocess.run(
-            f'rclone copy -vv {gcs_remote}leap-scratch/norlandrhagen/ {osn_remote}test-transfer-beam/',
+            f'rclone copy -vv -P {gcs_remote}leap-persistent/data-library/feedstocks/GODAS/GODAS_surface_level.zarr/ {osn_remote}test-transfer-beam/GODAS_surface_level.zarr',
             shell=True,
             capture_output=True,
             text=True,
