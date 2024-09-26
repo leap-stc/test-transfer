@@ -44,9 +44,11 @@ class Transfer(beam.PTransform):
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest"
         ).payload.data.decode("UTF-8")
 
-
-
-
+        # Todo!
+        # 1. use old method for osn create with subprocess
+        # 2. rclone config file -> gives path to config file
+        # 3. use rclone config file path to write gcs
+        #
         rclone_create_config_file_str = f"""
         [leap-gcs-scratch]
         type = google cloud storage
@@ -58,31 +60,29 @@ class Transfer(beam.PTransform):
         endpoint = https://nyu1.osn.mghpcc.org
         access_key_id = {osn_id}
         secret_access_key = {osn_secret}
-        no_touch_bucket = true 
+        no_touch_bucket = true
 
         """
 
-        with open('~/.config/rclone/rclone.conf', 'w+') as of:
+        with open("~/.config/rclone/rclone.conf", "w+") as of:
             of.write(rclone_create_config_file_str)
 
-
-
         ls_out_osn = subprocess.run(
-            f"rclone ls osn:m2lines-test",
+            "rclone ls osn:m2lines-test",
             shell=True,
             capture_output=True,
             text=True,
         )
         logger.warn(ls_out_osn)
-    
+
         ls_out_gcp = subprocess.run(
-            f"rclone ls gcs:leap-scratch/norlandrhagen/",
+            "rclone ls gcs:leap-scratch/norlandrhagen/",
             shell=True,
             capture_output=True,
             text=True,
         )
         logger.warn(ls_out_gcp)
-        
+
         # copy_out = subprocess.run(
         #     f"rclone -v copy gcs:leap-scratch/norlandrhagen/air_temp.nc osn:{bucket_name}air_temp_rclone.zarr/",
         #     shell=True,
