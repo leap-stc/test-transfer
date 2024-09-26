@@ -81,7 +81,7 @@ class Transfer(beam.PTransform):
 
         """
 
-        with open("~/.config/rclone/rclone.conf", "w+") as of:
+        with open("/root/.config/rclone/rclone.conf", "w+") as of:
             of.write(rclone_create_config_file_str)
 
         ls_out_osn = subprocess.run(
