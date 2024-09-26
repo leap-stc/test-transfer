@@ -55,7 +55,7 @@ class Transfer(beam.PTransform):
         # source_prefix = "data-library/feedstocks/GODAS"
         source_prefix = ""
         # target_prefix = "test-transfer-beam-clean-2workers"
-        target_prefix = "test-transfer-500GB-faster-more"
+        target_prefix = "test-transfer-500GB-faster-more-mooooore"
 
         # construct full valid rclone 'paths'
         source = os.path.join(source_bucket, source_prefix, store_name).strip('/')
@@ -64,7 +64,7 @@ class Transfer(beam.PTransform):
         logger.warning(f"Copying from {source} to {target}")
   
         copy_proc = subprocess.run(
-            f'rclone copy --transfers 16 -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
+            f'rclone copy --transfers 64 -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
             shell=True,
             capture_output=False, # will expose secrets if true
             text=True, 
