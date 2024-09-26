@@ -49,82 +49,34 @@ class Transfer(beam.PTransform):
         #       provider=Ceph endpoint=https://nyu1.osn.mghpcc.org \
         #         --access_key_id={osn_id} \
         #         --secret_access_key={osn_secret}"
+
+        gcs_remote = ':"google cloud storage",env_auth=true:'
+        osn_remote = f':s3,provider=Ceph,endpoint="https://nyu1.osn.mghpcc.org",access_key_id={osn_id},secret_access_key={osn_secret}:'
         
         list_gcs = subprocess.run(
-            'rclone -vv lsf :"google cloud storage",env_auth:leap-scratch/',
+            f'rclone -vv lsf {gcs_remote}leap-scratch/',
             shell=True,
             capture_output=True,
             text=True,
         )
         logger.warning(list_gcs)
 
-        # # Todo!
-        # # 1. use old method for osn create with subprocess
-        # # 2. rclone config file -> gives path to config file
-        # # 3. use rclone config file path to write gcs
-        # #
-        # rclone_create_config_file_str = f"""
-        # [gcs]
-        # type = google cloud storage
-        # env_auth = true
+        list_osn = subprocess.run(
+            f'rclone -vv lsf {osn_remote}m2lines-test/',
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warning(list_osn)
 
-        # [osn-test]
-        # type = s3
-        # provider = Ceph
-        # endpoint = https://nyu1.osn.mghpcc.org
-        # access_key_id = {osn_id}
-        # secret_access_key = {osn_secret}
-        # no_touch_bucket = true
+        copy_proc = subprocess.run(
+            f'rclone copy -vv {gcs_remote}leap-scratch/norlandrhagen/ {osn_remote}test-transfer-beam/',
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warning(copy_proc)
 
-        # """
-            
-        # with open(".config/rclone/rclone.conf", "w+") as of:
-        #     of.write(rclone_create_config_file_str)
-
-        
-        # list_configs = subprocess.run(
-        #     [
-        #         "rclone config file",
-        #     ],
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True,
-        # )
-        # logger.warning(list_configs)
-
-        # list_remotes = subprocess.run(
-        #     [
-        #         "rclone listremotes",
-        #     ],
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True,
-        # )
-        # logger.warning(list_remotes)
-
-        # ls_out_osn = subprocess.run(
-        #     "rclone ls osn:m2lines-test",
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True,
-        # )
-        # logger.warn(ls_out_osn)
-
-        # ls_out_gcp = subprocess.run(
-        #     "rclone ls gcs:leap-scratch/norlandrhagen/",
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True,
-        # )
-        # logger.warn(ls_out_gcp)
-
-        # copy_out = subprocess.run(
-        #     f"rclone -v copy gcs:leap-scratch/norlandrhagen/air_temp.nc osn:{bucket_name}air_temp_rclone.zarr/",
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True,
-        # )
-        # logger.warn(copy_out)
         del client
         return self.target_store
 
