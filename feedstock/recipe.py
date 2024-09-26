@@ -51,7 +51,7 @@ class Transfer(beam.PTransform):
         #         --secret_access_key={osn_secret}"
         
         list_gcs = subprocess.run(
-            "rclone -vv lsf :"google cloud storage",env_auth:leap-scratch/",
+            'rclone -vv lsf :"google cloud storage",env_auth:leap-scratch/',
             shell=True,
             capture_output=True,
             text=True,
