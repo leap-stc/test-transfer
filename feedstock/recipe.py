@@ -61,7 +61,7 @@ class Transfer(beam.PTransform):
 
 
 
-        gcs_remote = ':"google cloud storage",env_auth=true:'
+        gcs_remote = ":gcs,env_auth=true:"
         # # this does not work due to the colon in the endpoint? Gahhh this is awful...
         osn_remote = f":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
         
@@ -85,7 +85,7 @@ class Transfer(beam.PTransform):
 
 
         copy_proc = subprocess.run(
-            f'rclone copy -P "{gcs_remote}leap-persistent/data-library/feedstocks/GODAS/GODAS_surface_level.zarr/" "{osn_remote}test-transfer-beam/GODAS_surface_level.zarr"',
+            f'rclone copy -P "{gcs_remote}leap-persistent/data-library/feedstocks/GODAS/GODAS_surface_level.zarr/" "{osn_remote}/m2lines-test/test-transfer-beam/GODAS_surface_level.zarr/"',
             shell=True, #consider false
             capture_output=True, #set to false once we have this working!
             text=True,
