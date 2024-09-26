@@ -46,9 +46,7 @@ class Transfer(beam.PTransform):
 
         list_configs = subprocess.run(
             [
-                "rclone",
-                "config",
-                "file",
+                "rclone config file",
             ],
             shell=True,
             capture_output=True,
