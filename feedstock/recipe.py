@@ -49,20 +49,22 @@ class Transfer(beam.PTransform):
         osn_remote = f":s3,provider=Ceph,endpoint='https://nyu1.osn.mghpcc.org',access_key_id={osn_id},secret_access_key={osn_secret}:"
 
         ## Todo: parse this from input
-        store_name = "/data-library"
-        source_bucket = f"{gcs_remote}leap-persistent"
-        target_bucket = f"{osn_remote}m2lines-test"
+        store_name = "data-library"
+        source_bucket = f"leap-persistent"
+        target_bucket = f"m2lines-test"
         # source_prefix = "data-library/feedstocks/GODAS"
         source_prefix = ""
         # target_prefix = "test-transfer-beam-clean-2workers"
         target_prefix = "test-transfer-500GB"
 
         # construct full valid rclone 'paths'
-        source = os.path.join(source_bucket, source_prefix, store_name).rstrip('/')
-        target = os.path.join(target_bucket, target_prefix, store_name).rstrip('/')
+        source = os.path.join(source_bucket, source_prefix, store_name).strip('/')
+        target = os.path.join(target_bucket, target_prefix, store_name).strip('/')
+
+        logger.warning(f"Copying from {source} to {target}")
   
         copy_proc = subprocess.run(
-            f'rclone copy -vv -P "{source}/" "{target}/"',
+            f'rclone copy -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
             shell=True,
             capture_output=False, # will expose secrets if true
             text=True, 
