@@ -44,15 +44,7 @@ class Transfer(beam.PTransform):
             name="projects/leap-pangeo/secrets/OSN_CATALOG_BUCKET_KEY_SECRET/versions/latest"
         ).payload.data.decode("UTF-8")
 
-        list_configs = subprocess.run(
-            [
-                "rclone config file",
-            ],
-            shell=True,
-            capture_output=True,
-            text=True,
-        )
-        logger.warning(list_configs)
+
         # rclone_create_config_osn_str = f"rclone config create osn s3 \
         #       provider=Ceph endpoint=https://nyu1.osn.mghpcc.org \
         #         --access_key_id={osn_id} \
@@ -67,7 +59,7 @@ class Transfer(beam.PTransform):
         # 3. use rclone config file path to write gcs
         #
         rclone_create_config_file_str = f"""
-        [leap-gcs-scratch]
+        [gcs]
         type = google cloud storage
         env_auth = true
 
@@ -83,6 +75,30 @@ class Transfer(beam.PTransform):
 
         with open("/root/.config/rclone/rclone.conf", "w+") as of:
             of.write(rclone_create_config_file_str)
+            
+        # with open(".config/rclone/rclone.conf", "w+") as of:
+        #     of.write(rclone_create_config_file_str)
+
+        
+        list_configs = subprocess.run(
+            [
+                "rclone config file",
+            ],
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warning(list_configs)
+
+        list_remotes = subprocess.run(
+            [
+                "rclone listremotes",
+            ],
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        logger.warning(list_remotes)
 
         ls_out_osn = subprocess.run(
             "rclone ls osn:m2lines-test",
