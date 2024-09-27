@@ -63,7 +63,7 @@ class Transfer(beam.PTransform):
         logger.warning(f"Copying from {source} to {target}")
   
         copy_proc = subprocess.run(
-            f'rclone copy --s3-chunk-size 100M --s3-upload-concurrency 128 --transfers 128 --checkers 256  -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
+            f'rclone copy --fast-list --max-backlog 100000 --s3-chunk-size 100M --s3-upload-concurrency 128 --transfers 128 --checkers 256  -vv -P "{gcs_remote}{source}/" "{osn_remote}{target}/"',
             shell=True,
             capture_output=False, # will expose secrets if true
             text=True, 
